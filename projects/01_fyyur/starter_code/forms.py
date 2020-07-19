@@ -2,7 +2,48 @@ from datetime import datetime
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
 from wtforms.validators import DataRequired, AnyOf, URL
-
+from enum import Enum
+class Genres(str,Enum):
+    Alternative = 'Alternative'
+    Blues='Blues'
+    Classical='Classical'
+    Country='Country'
+    Electronic='Electronic'
+    Folk='Folk'
+    Funk='Funk'
+    HipHop='Hip-Hop'
+    HeavyMetal='Heavy Metal'
+    Instrumental='Instrumental'
+    Jazz='Jazz'
+    MusicalTheatre='Musical Theatre'
+    Pop='Pop'
+    Punk='Punk'
+    RB='R&B'
+    Reggae='Reggae'
+    RockNRoll='Rock n Roll'
+    Soul='Soul'
+    Other='Other'
+# geners = Enum('choices',
+#             {'Alternative': 'Alternative',
+#             'Blues': 'Blues',
+#             'Classical': 'Classical',
+#             'Country': 'Country',
+#             'Electronic': 'Electronic',
+#             'Folk': 'Folk',
+#             'Funk': 'Funk',
+#             'Hip-Hop': 'Hip-Hop',
+#             'Heavy Metal': 'Heavy Metal',
+#             'Instrumental': 'Instrumental',
+#             'Jazz': 'Jazz',
+#             'Musical Theatre': 'Musical Theatre',
+#             'Pop': 'Pop',
+#             'Punk': 'Punk',
+#             'R&B': 'R&B',
+#             'Reggae': 'Reggae',
+#             'Rock n Roll': 'Rock n Roll',
+#             'Soul': 'Soul',
+#             'Other': 'Other'}
+#         )
 class ShowForm(Form):
     artist_id = StringField(
         'artist_id'
@@ -91,27 +132,7 @@ class VenueForm(Form):
     genres = SelectMultipleField(
         # TODO implement enum restriction
         'genres', validators=[DataRequired()],
-        choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
-        ]
+        choices=[(Genre.value, Genre.value) for Genre in Genres]
     )
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
@@ -190,27 +211,7 @@ class ArtistForm(Form):
     genres = SelectMultipleField(
         # TODO implement enum restriction
         'genres', validators=[DataRequired()],
-        choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
-        ]
+        choices=[(Genre.value, Genre.value) for Genre in Genres]
     )
     facebook_link = StringField(
         # TODO implement enum restriction
