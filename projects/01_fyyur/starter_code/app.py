@@ -50,7 +50,8 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500),nullable=True)
     genres = db.Column(postgresql.ARRAY(db.Enum(Genres)),nullable=False)
     facebook_link = db.Column(db.String(120),nullable=True)
-   
+    seeking_talent = db.Column(db.Boolean,nullable=False,default=False)
+    seeking_description = db.Column(db.String(500),nullable=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -246,9 +247,16 @@ def create_venue_submission():
         image_link = request.form.get('image_link')
         genres =request.form.getlist('genres')
         facebook_link = request.form.get('facebook_link')
+        seeking_talent = request.form.get('seeking_talent')
+        if seeking_talent == "True":
+          seeking_talent = True
+        else :
+          seeking_talent = False
+
+        seeking_description = request.form.get('seeking_description')
         venue = Venue(name = name,
         city = city,state = state,address =address,phone = phone,image_link = image_link,
-        genres =genres,facebook_link = facebook_link)
+        genres =genres,facebook_link = facebook_link,seeking_talent=seeking_talent,seeking_description=seeking_description)
         db.session.add(venue)
         db.session.commit()
         data= venue
