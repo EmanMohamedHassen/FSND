@@ -140,6 +140,9 @@ class VenueForm(Form):
     image_link= StringField(
         'image_link', validators=[URL()]
     )
+    website = StringField(
+        'website', validators=[URL()]
+    )
     seeking_talent=BooleanField(
         'seeking_talent'
 

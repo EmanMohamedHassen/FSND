@@ -52,6 +52,7 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120),nullable=True)
     seeking_talent = db.Column(db.Boolean,nullable=False,default=False)
     seeking_description = db.Column(db.String(500),nullable=True)
+    website =db.Column(db.String(120),nullable=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -247,6 +248,7 @@ def create_venue_submission():
         image_link = request.form.get('image_link')
         genres =request.form.getlist('genres')
         facebook_link = request.form.get('facebook_link')
+        website = request.form.get('website')
         seeking_talent = request.form.get('seeking_talent')
         if seeking_talent == "True":
           seeking_talent = True
@@ -256,7 +258,8 @@ def create_venue_submission():
         seeking_description = request.form.get('seeking_description')
         venue = Venue(name = name,
         city = city,state = state,address =address,phone = phone,image_link = image_link,
-        genres =genres,facebook_link = facebook_link,seeking_talent=seeking_talent,seeking_description=seeking_description)
+        genres =genres,facebook_link = facebook_link,website=website,
+        seeking_talent=seeking_talent,seeking_description=seeking_description)
         db.session.add(venue)
         db.session.commit()
         data= venue
@@ -481,12 +484,46 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+    error = False
+    data = {}
+    try:
+        name = request.form.get('name')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        address =request.form.get('address')
+        phone = request.form.get('phone')
+        image_link = request.form.get('image_link')
+        genres =request.form.getlist('genres')
+        facebook_link = request.form.get('facebook_link')
+        seeking_talent = request.form.get('seeking_talent')
+        if seeking_talent == "True":
+          seeking_talent = True
+        else :
+          seeking_talent = False
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+        seeking_description = request.form.get('seeking_description')
+        venue = Venue(name = name,
+        city = city,state = state,address =address,phone = phone,image_link = image_link,
+        genres =genres,facebook_link = facebook_link,seeking_talent=seeking_talent,seeking_description=seeking_description)
+        db.session.add(venue)
+        db.session.commit()
+        data= venue
+        print(data)
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    else:
+          # on successful db insert, flash success
+        flash('Artist ' + request.form['name'] + ' was successfully listed!')
+
+    # TODO: on unsuccessful db insert, flash an error instead.
+    # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    return render_template('pages/home.html')
 
 
 #  Shows
