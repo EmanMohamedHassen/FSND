@@ -63,12 +63,13 @@ class Artist(db.Model):
     name = db.Column(db.String,nullable=False)
     city = db.Column(db.String(120),nullable=False)
     state = db.Column(db.String(120),nullable=False)
-    address = db.Column(db.String(120),nullable=False)
     phone = db.Column(db.String(120),nullable=True)
     image_link = db.Column(db.String(500),nullable=True)
     genres = db.Column(postgresql.ARRAY(db.Enum(Genres)),nullable=False)
     facebook_link = db.Column(db.String(120),nullable=True)
-
+    seeking_venue=db.Column(db.Boolean,nullable=False,default=False)
+    seeking_description = db.Column(db.String(500),nullable=True)
+    website =db.Column(db.String(120),nullable=True)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -490,24 +491,25 @@ def create_artist_submission():
         name = request.form.get('name')
         city = request.form.get('city')
         state = request.form.get('state')
-        address =request.form.get('address')
         phone = request.form.get('phone')
         image_link = request.form.get('image_link')
         genres =request.form.getlist('genres')
         facebook_link = request.form.get('facebook_link')
-        seeking_talent = request.form.get('seeking_talent')
-        if seeking_talent == "True":
-          seeking_talent = True
+        website = request.form.get('website')
+        seeking_venue = request.form.get('seeking_venue')
+        if seeking_venue == "True":
+          seeking_venue = True
         else :
-          seeking_talent = False
+          seeking_venue = False
 
         seeking_description = request.form.get('seeking_description')
-        venue = Venue(name = name,
-        city = city,state = state,address =address,phone = phone,image_link = image_link,
-        genres =genres,facebook_link = facebook_link,seeking_talent=seeking_talent,seeking_description=seeking_description)
-        db.session.add(venue)
+        artist = Artist(name = name,
+        city = city,state = state,phone = phone,image_link = image_link,
+        genres =genres,facebook_link = facebook_link,website=website,
+        seeking_venue=seeking_venue,seeking_description=seeking_description)
+        db.session.add(artist)
         db.session.commit()
-        data= venue
+        data= artist
         print(data)
     except:
         error = True
