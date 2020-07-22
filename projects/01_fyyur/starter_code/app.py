@@ -15,6 +15,7 @@ from forms import *
 from flask_migrate import Migrate
 import sys
 from sqlalchemy.dialects import postgresql
+import itertools
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -53,6 +54,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean,nullable=False,default=False)
     seeking_description = db.Column(db.String(500),nullable=True)
     website =db.Column(db.String(120),nullable=True)
+    shows = db.relationship('Show',backref='VShow',lazy=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -70,6 +72,7 @@ class Artist(db.Model):
     seeking_venue=db.Column(db.Boolean,nullable=False,default=False)
     seeking_description = db.Column(db.String(500),nullable=True)
     website =db.Column(db.String(120),nullable=True)
+    shows = db.relationship('Show',backref='AShow',lazy=True)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -109,27 +112,44 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  #data =Venue.query.all()
+  keys = db.session.query(Venue.city,Venue.state).distinct().all()
+  res = db.session.query(Venue.id,Venue.name,Venue.city,Venue.state,db.func.count(Show.id)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id,Venue.city).all()
+  data=[]
+  for k in keys:
+    obj = {}
+    obj["city"] =k.city
+    obj["state"]=k.state
+    obj["venues"]=[]
+    for r in res:
+      if r.city == k.city and r.state == k.state :
+        ven = {}
+        ven['id'] = r.id
+        ven['name']=r.name
+        ven['num_upcoming_shows'] = r[4]
+        obj['venues'].append(ven)
+    data.append(obj)
+  # data=[{
+  #   "city": "San Francisco",
+  #   "state": "CA",
+  #   "venues": [{
+  #     "id": 1,
+  #     "name": "The Musical Hop",
+  #     "num_upcoming_shows": 0,
+  #   }, {
+  #     "id": 3,
+  #     "name": "Park Square Live Music & Coffee",
+  #     "num_upcoming_shows": 1,
+  #   }]
+  # }, {
+  #   "city": "New York",
+  #   "state": "NY",
+  #   "venues": [{
+  #     "id": 2,
+  #     "name": "The Dueling Pianos Bar",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }]
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
