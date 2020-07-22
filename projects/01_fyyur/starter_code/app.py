@@ -114,7 +114,7 @@ def venues():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   #data =Venue.query.all()
   keys = db.session.query(Venue.city,Venue.state).distinct().all()
-  res = db.session.query(Venue.id,Venue.name,Venue.city,Venue.state,db.func.count(Show.id)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id,Venue.city).all()
+  res = db.session.query(Venue.id,Venue.name,Venue.city,Venue.state,db.func.count(Show.id)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id).all()
   data=[]
   for k in keys:
     obj = {}
@@ -157,14 +157,27 @@ def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }
+  searchTerm = request.form.get("search_term")
+  search = "%{}%".format(searchTerm.lower())
+  data= db.session.query(Venue.id,Venue.name,db.func.count(Show.id)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id).filter(db.func.lower(Venue.name).like(search)).all()
+  #data = Venue.query.filter(db.func.lower(Venue.name).like(search)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id).all()
+  response = {}
+  response["count"]= len(data)
+  response['data']=[]
+  for d in data :
+    info={}
+    info['id']=d.id
+    info['name']=d.name
+    info['num_upcoming_shows']=d[2]
+    response['data'].append(info)
+  # response={
+  #   "count": 1,
+  #   "data": [{
+  #     "id": 2,
+  #     "name": "The Dueling Pianos Bar",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
