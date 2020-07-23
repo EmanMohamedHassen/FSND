@@ -117,17 +117,17 @@ def venues():
   keys = db.session.query(Venue.city,Venue.state).distinct().all()
   res = db.session.query(Venue.id,Venue.name,Venue.city,Venue.state,db.func.count(Show.id)).outerjoin(Show,Venue.id==Show.id).group_by(Venue.id).all()
   data=[]
-  for k in keys:
+  for key in keys:
     obj = {}
-    obj["city"] =k.city
-    obj["state"]=k.state
+    obj["city"] =key.city
+    obj["state"]=key.state
     obj["venues"]=[]
-    for r in res:
-      if r.city == k.city and r.state == k.state :
+    for item in res:
+      if item.city == key.city and item.state == key.state :
         ven = {}
-        ven['id'] = r.id
-        ven['name']=r.name
-        ven['num_upcoming_shows'] = r[4]
+        ven['id'] = item.id
+        ven['name']=item.name
+        ven['num_upcoming_shows'] = item[4]
         obj['venues'].append(ven)
     data.append(obj)
   return render_template('pages/venues.html', areas=data)
@@ -143,11 +143,11 @@ def search_venues():
   response = {}
   response["count"]= len(data)
   response['data']=[]
-  for d in data :
+  for item in data :
     info={}
-    info['id']=d.id
-    info['name']=d.name
-    info['num_upcoming_shows']=d[2]
+    info['id']=item.id
+    info['name']=item.name
+    info['num_upcoming_shows']=item[2]
     response['data'].append(info)
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
@@ -175,22 +175,22 @@ def show_venue(venue_id):
     data['upcoming_shows']=[]
     past = 0
     upcoming=0
-    for s in shows :
-      if s.Show.start_time < datetime.now() :
+    for show in shows :
+      if show.Show.start_time < datetime.now() :
         artist={
-          "artist_id": s.Artist.id,
-          "artist_name": s.Artist.name,
-          "artist_image_link":s.Artist.image_link,
-          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+          "artist_id": show.Artist.id,
+          "artist_name": show.Artist.name,
+          "artist_image_link":show.Artist.image_link,
+          "start_time": show.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['past_shows'].append(artist)
         past += 1
       else :
         artist={
-          "artist_id": s.Artist.id,
-          "artist_name": s.Artist.name,
-          "artist_image_link":s.Artist.image_link,
-          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+          "artist_id": show.Artist.id,
+          "artist_name": show.Artist.name,
+          "artist_image_link":show.Artist.image_link,
+          "start_time": show.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['upcoming_shows'].append(artist)
         upcoming +=1
@@ -303,11 +303,11 @@ def search_artists():
   response = {}
   response["count"]= len(data)
   response['data']=[]
-  for d in data :
+  for item in data :
     info={}
-    info['id']=d.id
-    info['name']=d.name
-    info['num_upcoming_shows']=d[2]
+    info['id']=item.id
+    info['name']=item.name
+    info['num_upcoming_shows']=item[2]
     response['data'].append(info)
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
@@ -336,22 +336,22 @@ def show_artist(artist_id):
     data['upcoming_shows']=[]
     past = 0
     upcoming=0
-    for s in shows :
-      if s.Show.start_time < datetime.now() :
+    for show in shows :
+      if show.Show.start_time < datetime.now() :
         artist={
-          "venue_id": s.Venue.id,
-          "venue_name": s.Venue.name,
-          "venue_image_link":s.Venue.image_link,
-          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+          "venue_id": show.Venue.id,
+          "venue_name": show.Venue.name,
+          "venue_image_link":show.Venue.image_link,
+          "start_time": show.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['past_shows'].append(artist)
         past += 1
       else :
         artist={
-          "venue_id": s.Venue.id,
-          "venue_name": s.Venue.name,
-          "venue_image_link":s.Venue.image_link,
-          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+          "venue_id": show.Venue.id,
+          "venue_name": show.Venue.name,
+          "venue_image_link":show.Venue.image_link,
+          "start_time": show.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['upcoming_shows'].append(artist)
         upcoming +=1
@@ -477,7 +477,7 @@ def edit_venue_submission(venue_id):
     db.session.rollback()
     print(sys.exc_info())
   finally:
-        db.session.close()
+    db.session.close()
   if error:
     flash('An error occurred. Venue ' + data.name + ' could not be Edited.')
   else:
@@ -548,16 +548,16 @@ def shows():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   shows = Show.query.all()
   data=[]
-  for s in shows:
-    venue = Venue.query.get(s.venue_id)
-    artist=Artist.query.get(s.artist_id)
+  for show in shows:
+    venue = Venue.query.get(show.venue_id)
+    artist=Artist.query.get(show.artist_id)
     obj={
       "venue_id": venue.id,
       "venue_name": venue.name,
       "artist_id": artist.id,
       "artist_name": artist.name,
       "artist_image_link": artist.image_link,
-      "start_time": s.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+      "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
     }
     data.append(obj)
 
