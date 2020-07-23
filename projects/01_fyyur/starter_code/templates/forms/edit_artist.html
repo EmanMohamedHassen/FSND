@@ -15,13 +15,13 @@
               {{ form.city(class_ = 'form-control', placeholder='City', autofocus = true,value=artist.city) }}
             </div>
             <div class="form-group">
-              {{ form.state(class_ = 'form-control', placeholder='State', autofocus = true) }}
+              {{ form.state(class_ = 'form-control', placeholder='State', autofocus = true,value=artist.state )}}
             </div>
           </div>
       </div>
       <div class="form-group">
           <label for="phone">Phone</label>
-          {{ form.phone(class_ = 'form-control', placeholder='xxx-xxx-xxxx', autofocus = true) }}
+          {{ form.phone(class_ = 'form-control', placeholder='xxx-xxx-xxxx', autofocus = true,value=artist.phone) }}
         </div>
       <div class="form-group">
         <label for="genres">Genres</label>
@@ -30,14 +30,14 @@
       </div>
       <div class="form-group">
           <label for="genres">Facebook Link</label>
-          {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+          {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true,value=artist.facebook_link) }}
         </div>
         <div class="form-group">
-          {{ form.seeking_venue(class_='seeking',value='False') }}<label>&nbsp; Is Seeking Venue ?</label>
+          {{ form.seeking_venue(class_='seeking',value='False',checked=artist.seeking_venue) }}<label>&nbsp; Is Seeking Venue ?</label>
         </div>
-        <div class="form-group" id="descDiv" style="display: none;">
+        <div class="form-group" id="descDiv" {% if artist.seeking_venue %}style="display: true;"{% else %}style="display: none;"{% endif %}  >
           <label for="genres">Description</label>
-          {{ form.seeking_description(class_ = 'form-control', placeholder='', autofocus = true) }}
+          {{ form.seeking_description(class_ = 'form-control', placeholder='', autofocus = true,value=artist.seeking_description) }}
         </div>
       <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
     </form>
