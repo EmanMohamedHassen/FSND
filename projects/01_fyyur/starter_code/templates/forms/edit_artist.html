@@ -33,6 +33,14 @@
           {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true,value=artist.facebook_link) }}
         </div>
         <div class="form-group">
+          <label for="genres">Image Link</label>
+          {{ form.image_link(class_ = 'form-control', placeholder='', autofocus = true,value=artist.image_link) }}
+        </div>
+        <div class="form-group">
+          <label for="genres">Website</label>
+          {{ form.website(class_ = 'form-control', placeholder='', autofocus = true,value=artist.website) }}
+        </div>
+        <div class="form-group">
           {{ form.seeking_venue(class_='seeking',value='False',checked=artist.seeking_venue) }}<label>&nbsp; Is Seeking Venue ?</label>
         </div>
         <div class="form-group" id="descDiv" {% if artist.seeking_venue %}style="display: true;"{% else %}style="display: none;"{% endif %}  >
