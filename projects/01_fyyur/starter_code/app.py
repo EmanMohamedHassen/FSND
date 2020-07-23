@@ -185,7 +185,7 @@ def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   venue = Venue.query.get(venue_id)
-  shows=Show.query.filter_by(venue_id=venue_id).join(Artist).all()
+  shows= db.session.query(Show,Artist).filter_by(venue_id=venue_id).join(Artist).all()
   data={}
   if venue is not None :
     data['id']=venue.id
@@ -195,31 +195,31 @@ def show_venue(venue_id):
     data['city']=venue.city
     data['state']=venue.state
     data['phone']=venue.phone
-    date['website'] = venue.website
+    data['website'] = venue.website
     data['facebook_link']=venue.facebook_link
     data['seeking_talent']=venue.seeking_talent
     data['seeking_description']=venue.seeking_description
     data['image_link']=venue.image_link
     data['past_shows']=[]
     data['upcoming_shows']=[]
+    past = 0
+    upcoming=0
     for s in shows :
-      past = 0
-      upcoming=0
-      if s.start_time < datetime.now() :
+      if s.Show.start_time < datetime.now() :
         artist={
-          "artist_id": s.id,
-          "artist_name": s.name,
-          "artist_image_link":s.image_link,
-          "start_time": s.start_time
+          "artist_id": s.Artist.id,
+          "artist_name": s.Artist.name,
+          "artist_image_link":s.Artist.image_link,
+          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['past_shows'].append(artist)
         past += 1
       else :
         artist={
-          "artist_id": s.id,
-          "artist_name": s.name,
-          "artist_image_link":s.image_link,
-          "start_time": s.start_time
+          "artist_id": s.Artist.id,
+          "artist_name": s.Artist.name,
+          "artist_image_link":s.Artist.image_link,
+          "start_time": s.Show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
         data['upcoming_shows'].append(artist)
         upcoming +=1
