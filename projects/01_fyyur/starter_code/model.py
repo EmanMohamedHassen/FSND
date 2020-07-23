@@ -1,3 +1,13 @@
+from __main__ import app
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects import postgresql
+from forms import Genres
+db = SQLAlchemy(app,session_options={
+
+    'expire_on_commit': False
+
+})
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
