@@ -16,17 +16,37 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-
+  cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
+  ''' 
+  @app.after_request
+  def after_request(response):
+      response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+      response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+      return response
 
   '''
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+  @app.route('/categories',methods=['GET','POST'])
+  def get_categories():
+    page= request.args.get('page',1,type=int)
+    start = (page - 1 )*10
+    end = start + 10
+    categories = Category.query.all()
+    formatted_categories = [category.format() for category in categories]
 
+    if len(formatted_categories) == 0 :
+      abort(404)
+
+    return jsonify({
+      'success':True,
+      'categories':formatted_categories[start:end],
+      'total_categories':len(formatted_categories)
+    })
 
   '''
   @TODO: 
@@ -40,7 +60,6 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
-
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
