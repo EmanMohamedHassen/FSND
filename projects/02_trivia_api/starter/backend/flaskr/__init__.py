@@ -31,20 +31,21 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-  @app.route('/categories',methods=['GET','POST'])
+  @app.route('/categories',methods=['GET'])
   def get_categories():
     page= request.args.get('page',1,type=int)
     start = (page - 1 )*10
     end = start + 10
     categories = Category.query.all()
     formatted_categories = [category.format() for category in categories]
+    categoriesObject = {category.id:category.type for category in categories}
 
     if len(formatted_categories) == 0 :
       abort(404)
 
     return jsonify({
       'success':True,
-      'categories':formatted_categories[start:end],
+      'categories':categoriesObject,
       'total_categories':len(formatted_categories)
     })
 
@@ -60,7 +61,7 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
-  @app.route('/questions',methods=['GET','POST'])
+  @app.route('/questions',methods=['GET'])
   def questions():
     page=request.args.get('page',1,type=int)
     start = (page-1)*10
@@ -112,6 +113,24 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions',methods=['POST'])
+  def add_question():
+    body = request.get_json()
+    question_text= body.get('question',None)
+    answer = body.get('answer',None)
+    difficulty = body.get('difficulty',None)
+    category = body.get('category',None)
+    try:
+      question = Question(question=question_text,answer=answer,difficulty=difficulty,category=category)
+      question.insert()
+
+      return jsonify({
+        'success': True,
+        'createdQuestion':question.id
+      })
+    except:
+      abort(422)
+      
 
   '''
   @TODO: 
@@ -123,7 +142,7 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
-
+  
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
