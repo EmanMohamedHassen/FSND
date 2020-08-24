@@ -5,7 +5,7 @@ from flask_cors import CORS
 import random
 
 from models import setup_db, Question, Category
-
+from sqlalchemy import func
 QUESTIONS_PER_PAGE = 10
 
 def create_app(test_config=None):
@@ -142,6 +142,25 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions/<string:searchTerm>',methods=['POST'])
+  def search_question(searchTerm):
+    # body = request.get_json()
+    # searchTerm = body.get('searchTerm','')
+    search = "%{}%".format(searchTerm.lower())
+    questions = Question.query.filter(func.lower(Question.question).like(search)).all()
+    formatted_questions = [question.format() for question in questions]
+    categories = {category.id:category.type for category in Category.query.all()}
+
+    if len(formatted_questions) == 0 :
+      abort(404)
+
+    return jsonify({
+      'success':True,
+      'questions':formatted_questions,
+      'total_questions':len(formatted_questions),
+      'current_category':'',
+      'categories':categories
+    })
   
   '''
   @TODO: 
@@ -151,8 +170,25 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/questions/<int:category_id>',methods=['GET'])
+  def get_questions(category_id) :
+    try:
+      questions = Question.query.filter(Question.category == category_id).all()
+      formatted_questions = [question.format() for question in questions]
+      categories = {category.id:category.type for category in Category.query.all()}
 
+      if len(formatted_questions) == 0 :
+        abort(404)
 
+      return jsonify({
+        'success':True,
+        'questions':formatted_questions,
+        'total_questions':len(formatted_questions),
+        'current_category':'',
+        'categories':categories
+      })
+    except:
+      abort(422)
   '''
   @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
