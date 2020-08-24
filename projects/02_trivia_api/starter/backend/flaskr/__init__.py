@@ -144,8 +144,6 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<string:searchTerm>',methods=['POST'])
   def search_question(searchTerm):
-    # body = request.get_json()
-    # searchTerm = body.get('searchTerm','')
     search = "%{}%".format(searchTerm.lower())
     questions = Question.query.filter(func.lower(Question.question).like(search)).all()
     formatted_questions = [question.format() for question in questions]
@@ -170,12 +168,12 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
-  @app.route('/questions/<int:category_id>',methods=['GET'])
-  def get_questions(category_id) :
+  @app.route('/categories/<int:id>/questions',methods=['GET'])
+  def get_questions(id) :
     try:
-      questions = Question.query.filter(Question.category == category_id).all()
+      questions = Question.query.filter(Question.category == id).all()
       formatted_questions = [question.format() for question in questions]
-      categories = {category.id:category.type for category in Category.query.all()}
+      current_category=Category.query.filter_by(id=id).first()
 
       if len(formatted_questions) == 0 :
         abort(404)
@@ -184,8 +182,7 @@ def create_app(test_config=None):
         'success':True,
         'questions':formatted_questions,
         'total_questions':len(formatted_questions),
-        'current_category':'',
-        'categories':categories
+        'current_category':current_category.type
       })
     except:
       abort(422)
