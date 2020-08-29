@@ -72,9 +72,12 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/questions'
+DELETE '/questions/<int:id>'
+POST '/questions'
+POST '/questions/<string:searchTerm>'
+GET '/categories/<int:id>/questions'
+POST '/quizzes'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
@@ -87,6 +90,45 @@ GET '/categories'
 '5' : "Entertainment",
 '6' : "Sports"}
 
+GET '/questions'
+-Fetches All Question Including a Pagination (every 10 questions)
+- Request Arguments: None
+- Returns: An object with a list of questions,total number of questions,current_category,categories.
+
+DELETE '/questions/<int:id>'
+-DELETE a question using a question ID
+- Request Arguments: <int:id>
+-Returns: delete question object and return an object with a success parameter.
+
+POST '/questions'
+-Insert A new Question to db 
+-Request Arguments: a json object will require the question and answer text,category, and difficulty score for example: {
+            'question':"Who Invented the Automobile?",
+            'answer':'Nicolas-Joseph',
+            'difficulty':'2',
+            'category':'1'
+        }
+-Returns:  an object with a success parameter& createdQuestion id .
+
+POST '/questions/<string:searchTerm>'
+-search a question based on a search term
+-Request Arguments:<string:searchTerm> a string of search term
+-Returns:  an object with questions for whom the search term 	
+  is a substring of the question ,a success parameter& total_questions,current_category and categories.
+
+GET '/categories/<int:id>/questions'
+-Fetches questions based on category ID
+-Request Arguments:<int:id> category id 
+-Returns : an object with questions for holds the category id  	
+  , a success parameter& total_questions and current_category.
+
+POST '/quizzes'
+-Fetches questions to play the quiz
+-Request Arguments: a json object will require the previous questions and category,category for example: {
+            'previous_questions':'[1,2,3]',
+            'quiz_category':'2'
+        }
+-Returns: an object with a random question within the givin category
 ```
 
 
