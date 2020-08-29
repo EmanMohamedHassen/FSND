@@ -136,29 +136,33 @@ def create_app(test_config=None):
     except:
       abort(422)
   #Get A random Question For Quiz
-  @app.route('/quizzes',methods=['POST'])
-  def get_quizzes() :
-    try:
-      body = request.get_json()
-      previous_questions= body.get('previous_questions',None)
-      quiz_category = body.get('quiz_category',None)
-      if quiz_category['id'] == 0 :
-        questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
-      else:
-        questions = Question.query.filter(Question.category == quiz_category['id'], Question.id.notin_(previous_questions)).all()
-      formatted_questions = [question.format() for question in questions]
-      if len(formatted_questions) == 0 :
-        return jsonify({
-        'success':True,
-      })
-
-      random_question =random.choice(formatted_questions)
-      return jsonify({
-        'success':True,
-        'question':random_question
-      })
-    except:
-      abort(422)
+  @app.route('/quizzes', methods=['POST'])
+  def get_quizzes():
+      try:
+          body = request.get_json()
+          previous_questions = body.get('previous_questions', None)
+          quiz_category = body.get('quiz_category', None)
+          if quiz_category['id'] == 0:
+              questions = Question.query.filter(
+                Question.id.notin_(previous_questions)
+                ).all()
+          else:
+              questions = Question.query.filter(
+                Question.category == quiz_category['id'],
+                Question.id.notin_(previous_questions)
+                ).all()
+          formatted_questions = [question.format() for question in questions]
+          if len(formatted_questions) == 0:
+              return jsonify({
+                  'success': True,
+                  })
+          random_question = random.choice(formatted_questions)
+          return jsonify({
+              'success': True,
+              'question': random_question
+          })
+      except:
+          abort(422)
 
   #Handling Errors
 
