@@ -48,7 +48,7 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail',methods=['GET'])
-# @requires_auth('get:drinks-detail')
+@requires_auth('get:drinks-detail')
 def get_drinks_details():
     drinks = Drink.query.all()
     formatted_drinks = [drink.long() for drink in drinks]
@@ -70,7 +70,7 @@ def get_drinks_details():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks',methods=['POST'])
-# @requires_auth('post:drinks')
+@requires_auth('post:drinks')
 def add_drink():
     body = request.get_json()
     title= body.get('title',None)
@@ -98,7 +98,7 @@ def add_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<id>',methods=['PATCH'])
-# @requires_auth('patch:drinks')
+@requires_auth('patch:drinks')
 def edit_drink(id) :
     body = request.get_json()
     title= body.get('title',None)
@@ -132,6 +132,7 @@ def edit_drink(id) :
 '''
 
 @app.route('/drinks/<id>',methods=['DELETE'])
+@requires_auth('delete:drinks')
 def delete_drink(id) :
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
@@ -175,13 +176,21 @@ def unprocessable(error):
         "error": 400,
         "message": "bad request"
         }), 400
+
 @app.errorhandler(405)
 def unprocessable(error):
     return jsonify({
         "success": False, 
         "error": 405,
         "message": "method not allowed"
-        }), 405         
+        }), 405   
+@app.errorhandler(500)
+def unprocessable(error):
+    return jsonify({
+        "success": False, 
+        "error": 500,
+        "message": "Internal Server Error"
+        }), 500       
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above 
@@ -198,10 +207,10 @@ def not_found(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
-@app.errorhandler(401)
-def unprocessable(error):
+@app.errorhandler(AuthError)
+def unAuthorized(error):
     return jsonify({
         "success": False, 
-        "error": 401,
-        "message": "Not Authorized"
-        }), 401
+        "error": error.status_code,
+        "message": error.error
+        }), error.status_code
