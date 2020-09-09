@@ -9,22 +9,26 @@ AUTH0_DOMAIN = 'dev-5fzft7sl.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'Coffee Shop'
 
-## AuthError Exception
+# AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
 
 
-## Auth Header
+# Auth Header
 
 '''
 Get Token From Request Header
 '''
+
+
 def get_token_auth_header():
     auth = request.headers.get('Authorization', None)
     if not auth:
@@ -58,6 +62,8 @@ def get_token_auth_header():
 '''
 Check the requested permission in the payload permissions for a user
 '''
+
+
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
                         raise AuthError({
@@ -75,6 +81,8 @@ def check_permissions(permission, payload):
 '''
 verify the token using Auth0
 '''
+
+
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
@@ -116,7 +124,8 @@ def verify_decode_jwt(token):
         except jwt.JWTClaimsError:
             raise AuthError({
                 'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please, check the audience and issuer.'
+                'description':
+                    'Incorrect claims. Please, check the audience and issuer.'
             }, 401)
         except Exception:
             raise AuthError({
@@ -131,6 +140,8 @@ def verify_decode_jwt(token):
 '''
  @requires_auth(permission) decorator method
 '''
+
+
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
@@ -138,7 +149,7 @@ def requires_auth(permission=''):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
-            return f( *args, **kwargs)
+            return f(*args, **kwargs)
 
         return wrapper
     return requires_auth_decorator
