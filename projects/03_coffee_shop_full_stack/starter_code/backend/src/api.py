@@ -28,15 +28,21 @@ THIS MUST BE UNCOMMENTED ON FIRST RUN
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    drinks = Drink.query.all()
-    formatted_drinks = [drink.short() for drink in drinks]
-    if len(formatted_drinks) == 0:
-        abort(404)
+    try:
+        drinks = Drink.query.all()
+        formatted_drinks = [drink.short() for drink in drinks]
+        if len(formatted_drinks) == 0:
+            return json.dumps({
+                'success': False,
+                'error': 'Drinks List is empty'
+            }), 404
 
-    return jsonify({
-        'success': True,
-        "drinks": formatted_drinks
-    })
+        return jsonify({
+            'success': True,
+            "drinks": formatted_drinks
+        })
+    except:
+        abort(422)
 
 '''
     GET /drinks-detail
@@ -48,15 +54,21 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_details():
-    drinks = Drink.query.all()
-    formatted_drinks = [drink.long() for drink in drinks]
-    if len(formatted_drinks) == 0:
-        abort(404)
+    try:
+        drinks = Drink.query.all()
+        formatted_drinks = [drink.long() for drink in drinks]
+        if len(formatted_drinks) == 0:
+            return json.dumps({
+                'success': False,
+                'error': 'Drinks List is empty'
+            }), 404
 
-    return jsonify({
-        'success': True,
-        "drinks": formatted_drinks
-    })
+        return jsonify({
+            'success': True,
+            "drinks": formatted_drinks
+        })
+    except:
+        abort(422)
 
 '''
     POST /drinks
@@ -100,7 +112,10 @@ def edit_drink(id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
         if drink is None:
-            abort(404)
+            return json.dumps({
+                'success': False,
+                'error': 'Drink #' + id + ' not found to be edited'
+            }), 404
         if title is not None:
             drink.title = title
         if recipe is not None:
@@ -128,7 +143,10 @@ def delete_drink(id):
         drink = Drink.query.filter(Drink.id == id).one_or_none()
 
         if drink is None:
-            abort(404)
+            return json.dumps({
+                'success': False,
+                'error': 'Drink #' + id + ' not found to be edited'
+            }), 404
         drink.delete()
         return jsonify({
                 'success': True,
